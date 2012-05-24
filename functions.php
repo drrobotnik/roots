@@ -38,6 +38,6 @@ function roots_setup() {
   // Tell the TinyMCE editor to use a custom stylesheet
   add_editor_style('css/editor-style.css');
 
-}
+} 
 // Foo!
 add_action('after_setup_theme', 'roots_setup');
