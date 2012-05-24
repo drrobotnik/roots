@@ -241,3 +241,6 @@ pre code {
   padding: 0;
   background-color: transparent;
 }
+
+.one-half{display:block;width:45%;border:1px dashed #ccc;margin-left:6px;float:left;}
+.last{clear:right;}

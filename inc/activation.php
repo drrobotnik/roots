@@ -81,6 +81,19 @@ function roots_theme_activation_options_render_page() { ?>
       <input type="hidden" value="1" name="roots_theme_activation_options[first_run]" />
 
       <table class="form-table">
+        <?php $random_password = wp_generate_password( $length=12, $include_standard_special_chars=false ); ?>
+        <tr valign="top"><th scope="row"><?php _e('Create JT Admin User?', 'roots'); ?></th>
+          <td>
+            <fieldset><legend class="screen-reader-text"><span><?php _e('Create JT Admin User?', 'roots'); ?></span></legend>
+              <select name="roots_theme_activation_options[create_jt_admin]" id="create_jt_admin">
+                <option value="yes"><?php echo _e('Yes', 'roots'); ?></option>
+                <option selected="selected" value="no"><?php echo _e('No', 'roots'); ?></option>
+              </select>
+              <br />
+              <small class="description">Save this log-in information: U:jtcg P:<?php echo $random_password; ?>. A copy will be sent to wpadmin@jacobtyler.com.</small>
+            </fieldset>
+          </td>
+        </tr>
 
         <tr valign="top"><th scope="row"><?php _e('Create static front page?', 'roots'); ?></th>
           <td>
@@ -91,6 +104,27 @@ function roots_theme_activation_options_render_page() { ?>
               </select>
               <br />
               <small class="description"><?php printf(__('Create a page called Home and set it to be the static front page', 'roots')); ?></small>
+            </fieldset>
+          </td>
+        </tr>
+
+        <tr valign="top"><th scope="row"><?php _e('Create template pages?', 'roots'); ?></th>
+          <td>
+            <fieldset><legend class="screen-reader-text"><span><?php _e('Create template pages?', 'roots'); ?></span></legend>
+              <select name="roots_theme_activation_options[create_template_pages]" id="create_template_pages">
+                <option selected="selected" value="yes"><?php echo _e('Yes', 'roots'); ?></option>
+                <option value="no"><?php echo _e('No', 'roots'); ?></option>
+              </select>
+              <br />
+              <?php $default_pages = array_diff(scandir(get_stylesheet_directory().'/inc/pages/'), array('..', '.','.DS_Store','.TemporaryItems','.com.apple.timemachine.supported','.htaccess','.localized','.svn','index.php'));
+
+$titleList = '';
+
+foreach ($default_pages as $new_page_title) {
+  $title = str_replace(array('page-','post-','.html'), ' ', $new_page_title);
+  $titleList .= str_replace('_', ' ', $title);
+} ?>
+              <small class="description"><?php echo 'Create default pages? ( ' . $titleList .' )'; ?></small>
             </fieldset>
           </td>
         </tr>
@@ -185,6 +219,16 @@ function roots_theme_activation_options_validate($input) {
     $output['change_permalink_structure'] = $input['change_permalink_structure'];
   }
 
+  if (isset($input['create_jt_admin'])) {
+    if ($input['create_jt_admin'] === 'yes') {
+      $input['create_jt_admin'] = true;
+    }
+    if ($input['create_jt_admin'] === 'no') {
+      $input['create_jt_admin'] = false;
+    }
+    $output['create_jt_admin'] = $input['create_jt_admin'];
+  }
+
   if (isset($input['change_uploads_folder'])) {
     if ($input['change_uploads_folder'] === 'yes') {
       $input['change_uploads_folder'] = true;
@@ -221,8 +265,32 @@ function roots_theme_activation_options_validate($input) {
 function roots_theme_activation_action() {
   $roots_theme_activation_options = roots_get_theme_activation_options();
 
+if (is_admin() && isset($_GET['page']) && 'themes.php' == $GLOBALS['pagenow']) {
+  if($roots_theme_activation_options['create_jt_admin']){
+    $userdata = array (
+      'user_url' => 'http://www.jacobtyler.com',
+      'user_login' => 'jtcg', 
+      'user_pass'=>$random_password, 
+      'user_nicename' => 'Jacob Tyler', 
+      'user_email' => 'wpadmin@jacobtyler.com', 
+      'display_name' => 'Jacob Tyler', 
+      'nickname' => 'Dev Team',
+      'first_name' => 'Jacob',
+      'last_name' => 'Tyler', 
+      'role'=> 'administrator'
+      );
+
+
+    $new_user = wp_insert_user( $userdata );
+    if(is_int($new_user)){
+      wp_new_user_notification( $new_user, $random_password );
+    }
+  }
+}
   if ($roots_theme_activation_options['create_front_page']) {
     $roots_theme_activation_options['create_front_page'] = false;
+
+  if($roots_theme_activation_options['create_template_pages']){
 
 	$default_pages = array_diff(scandir(get_stylesheet_directory().'/inc/pages/'), array('..', '.','.DS_Store','.TemporaryItems','.com.apple.timemachine.supported','.htaccess','.localized','.svn','index.php'));
     $existing_pages = get_pages();
@@ -249,6 +317,8 @@ function roots_theme_activation_action() {
 		);
 
 		$result = wp_insert_post($add_default_pages);
+    }
+
     }
 
     $home = get_page_by_title('Home');
@@ -315,7 +385,13 @@ function roots_theme_activation_action() {
       }
     }
   }
-
+  update_option("default_comment_status","closed");
+  update_option( 'thumbnail_size_h', 0 );
+  update_option( 'thumbnail_size_w', 0 );
+  update_option( 'medium_size_h', 0 );
+  update_option( 'medium_size_w', 0 );
+  update_option( 'large_size_h', 0 );
+  update_option( 'large_size_w', 0 );
   update_option('roots_theme_activation_options', $roots_theme_activation_options);
 }
 
