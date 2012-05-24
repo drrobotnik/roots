@@ -224,7 +224,7 @@ function roots_theme_activation_action() {
   if ($roots_theme_activation_options['create_front_page']) {
     $roots_theme_activation_options['create_front_page'] = false;
 
-	$default_pages = array_diff(scandir(site_url().'/'.THEME_PATH.'/inc/pages/'), array('..', '.','.DS_Store','.TemporaryItems','.com.apple.timemachine.supported','.htaccess','.localized','.svn','index.php'));
+	$default_pages = array_diff(scandir(get_stylesheet_directory().'/inc/pages/'), array('..', '.','.DS_Store','.TemporaryItems','.com.apple.timemachine.supported','.htaccess','.localized','.svn','index.php'));
     $existing_pages = get_pages();
     $temp = array();
 
@@ -235,9 +235,9 @@ function roots_theme_activation_action() {
 	$pages_to_create = array_diff($default_pages, $temp);
 	
     foreach ($pages_to_create as $new_page_title) {
-		$page_content = file_get_contents(site_url().'/'.THEME_PATH.'/inc/pages/'.$new_page_title.'.html',true);
+		$page_content = file_get_contents(get_stylesheet_directory().'/inc/pages/'.$new_page_title,true);
 		$pieces = explode("-", $new_page_title);
-		$page_type = $piece[0];
+		$page_type = $pieces[0];
 		
 		$title = str_replace(array('page-','post-','.html'), ' ', $new_page_title);
 		$title = str_replace('_', ' ', $title);
@@ -245,7 +245,7 @@ function roots_theme_activation_action() {
 		'post_title' => $title,
 		'post_content' => $page_content,
 		'post_status' => 'publish',
-		'post_type' => 'page'
+		'post_type' => $page_type
 		);
 
 		$result = wp_insert_post($add_default_pages);

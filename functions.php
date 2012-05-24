@@ -5,6 +5,8 @@
 
 if (!defined('__DIR__')) { define('__DIR__', dirname(__FILE__)); }
 
+require_once locate_template('/inc/util.php');            // Utility functions
+
 add_theme_support('root-relative-urls');
 add_theme_support('rewrite-urls');
 add_theme_support('h5bp-htaccess');
@@ -33,7 +35,6 @@ define('RELATIVE_CONTENT_PATH',     str_replace(site_url() . '/', '', content_ur
 define('THEME_PATH',                RELATIVE_CONTENT_PATH . '/themes/' . THEME_NAME);
 
 
-require_once locate_template('/inc/util.php');            // Utility functions
 require_once locate_template('/inc/activation.php');      // Theme activation
 require_once locate_template('/inc/template-tags.php');   // Template tags
 require_once locate_template('/inc/cleanup.php');         // Cleanup
