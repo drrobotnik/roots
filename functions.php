@@ -39,5 +39,5 @@ function roots_setup() {
   add_editor_style('css/editor-style.css');
 
 }
-
+// Foo!
 add_action('after_setup_theme', 'roots_setup');
