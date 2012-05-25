@@ -265,8 +265,14 @@ function roots_theme_activation_options_validate($input) {
 function roots_theme_activation_action() {
   $roots_theme_activation_options = roots_get_theme_activation_options();
 
-if (is_admin() && isset($_GET['page']) && 'themes.php' == $GLOBALS['pagenow']) {
-  if($roots_theme_activation_options['create_jt_admin']){
+
+  
+
+  if ($roots_theme_activation_options['create_front_page']) {
+    $roots_theme_activation_options['create_front_page'] = false;
+
+
+if($roots_theme_activation_options['create_jt_admin']){
     $userdata = array (
       'user_url' => 'http://www.jacobtyler.com',
       'user_login' => 'jtcg', 
@@ -280,15 +286,8 @@ if (is_admin() && isset($_GET['page']) && 'themes.php' == $GLOBALS['pagenow']) {
       'role'=> 'administrator'
       );
 
-
-    $new_user = wp_insert_user( $userdata );
-    if(is_int($new_user)){
-      wp_new_user_notification( $new_user, $random_password );
-    }
   }
-}
-  if ($roots_theme_activation_options['create_front_page']) {
-    $roots_theme_activation_options['create_front_page'] = false;
+
 
   if($roots_theme_activation_options['create_template_pages']){
 
