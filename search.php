@@ -1,23 +1,14 @@
-<?php get_header(); ?>
-  <?php roots_content_before(); ?>
-    <div id="content" class="<?php echo CONTAINER_CLASSES; ?>">
-    <?php roots_main_before(); ?>
-      <div id="main" class="<?php echo MAIN_CLASSES; ?>" role="main">
-        <div class="page-header">
-          <h1><?php _e('Search Results for', 'roots'); ?> <?php echo get_search_query(); ?></h1>
-        </div>
-        <?php roots_loop_before(); ?>
-        <?php get_template_part('loop', 'search'); ?>
-        <?php roots_loop_after(); ?>
-      </div><!-- /#main -->
-    <?php roots_main_after(); ?>
-    <?php roots_sidebar_before(); ?>
-      <aside id="sidebar" class="<?php echo SIDEBAR_CLASSES; ?>" role="complementary">
-      <?php roots_sidebar_inside_before(); ?>
-        <?php get_sidebar(); ?>
-      <?php roots_sidebar_inside_after(); ?>
-      </aside><!-- /#sidebar -->
-    <?php roots_sidebar_after(); ?>
-    </div><!-- /#content -->
-  <?php roots_content_after(); ?>
-<?php get_footer(); ?>
+<?php get_template_part('templates/page', 'header'); ?>
+
+<?php if (!have_posts()) : ?>
+  <div class="alert alert-warning">
+    <?php _e('Sorry, no results were found.', 'sage'); ?>
+  </div>
+  <?php get_search_form(); ?>
+<?php endif; ?>
+
+<?php while (have_posts()) : the_post(); ?>
+  <?php get_template_part('templates/content', 'search'); ?>
+<?php endwhile; ?>
+
+<?php the_posts_navigation(); ?>
